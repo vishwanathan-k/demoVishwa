@@ -1,0 +1,186 @@
+<html>
+<head>
+  <title>Express HTML</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<style>
+		.row {
+			margin-right: -47px;
+			margin-left: 35px;
+		}
+	</style>	
+</head>
+<body>
+  <div style="margin:100px;">
+
+<nav class="navbar navbar-inverse navbar-static-top" style="background-image: linear-gradient(to bottom,#a92f2f 0,#222 100%);">
+  <div class="container">
+    <a class="navbar-brand" href="/" style="color:#fff">Company List</a>
+	  <button type="button" class="btn btn-danger btn-sm pull-right" onclick="goBack()" style="margin-top: 10px;margin-right: 7%;">Cancel</button>
+	  {% if userRole == "Admin" %}
+        <button type="button" class="btn btn-info btn-sm pull-right" data-toggle="modal" data-target="#addUseMyModal" id="recipentPlus" style="margin-top: 10px;margin-right: 1%;">Add Company</button>
+	  {% endif %}	
+     
+  </div>
+</nav>
+  <div class="jumbotron"  style="padding:40px;background-color: #8d8e84;"> 
+      	<table class="table">
+		<thead>
+			<tr>
+				<th style="color:#fff">User Name</th>			
+				<th style="color:#fff">Email</th>
+				 {% if loginUser.role == "Admin" %}
+				<th style="color:#fff;text-align: right;">Action</th>
+				 {% endif %}	
+			</tr>	
+		</thead>
+		<tbody>
+		  {% for x in values %}
+			<tr style="background-color:#4b6d50">
+				<td style="color:#fff">{{x.orgName}}</td>	
+				<td style="color:#fff">{{x.address}}</td>	
+				 {% if userRole == "Admin" %}
+				<td>
+				<button type="button" class="btn btn-warning btn-xs pull-right" onclick="editCompany('{{x.id}}')">Edit</button>
+				<button type="button" class="btn btn-danger btn-xs pull-right" onclick="deleteCompany('{{x.id}}')" style="margin-right: 4px;">Delete</button>
+				</td>
+				 {% endif %}	
+			<tr>	
+		{% endfor %}
+		</tbody>
+
+	</table>
+     	
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="addUseMyModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add Company</h4>
+        </div>
+		 <form method="post" action="/saveCompany" id="saveCompanyForm"> 
+        <div class="modal-body">
+		  <div class="row col-offset-1">
+				<div class="col-md-5">
+				  <label>Organization Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="hidden" class="form-control" id="userRole" name="userRole"  value="{{userRole}}"/>
+				   <input type="text" class="form-control" id="orgName" name="orgName" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Organization Address:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<textarea type="text" class="form-control" id="address" name="address" ></textarea>
+				</div>
+			  </div>
+        </div>
+        <div class="modal-footer">
+		  <button type="button" class="btn btn-success addFromValidation">Save</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+		  </form>	 
+   
+    </div>
+
+  </div>
+</div>
+	
+	<!-- Modal -->
+  <div class="modal fade" id="editCompanyMyModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Company</h4>
+        </div>
+		 <form method="post" action="/updateCompany" id="updateCompanyForm"> 
+        <div class="modal-body">
+		  <div class="row col-offset-1">
+				<div class="col-md-5">
+				  <label>Organization Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="hidden" class="form-control" id="editId" name="id" />	
+				  <input type="hidden" class="form-control" id="edituserRole" name="userRole" value="{{userRole}}"/>		
+				  <input type="text" class="form-control" id="editOrgName" name="orgName" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Organization Address:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<textarea type="text" class="form-control" id="editAddress" name="address" ></textarea>
+				</div>
+			  </div>
+        </div>
+        <div class="modal-footer">
+		  <button type="button" class="btn btn-success editFromValidation">Save</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+		  </form>	 
+   
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+	function goBack() {
+		window.history.back();
+	}
+	function editCompany(idVal){
+		$('#editCompanyMyModal').modal('show');
+		$.ajax({
+			url: '/editCompany/'+idVal,
+			type: 'put',
+			success: function(result) {
+				$('#editOrgName').val(result.dbOrganization.orgName);
+				$('#editAddress').val(result.dbOrganization.address);
+				$('#editId').val(result.dbOrganization._id);
+			}
+		});
+	}	
+	
+	function deleteCompany(idVal){
+		$.ajax({
+			url: '/deleteCompany/'+idVal,
+			type: 'delete',
+			success: function(result) {
+
+			}
+		});
+		  location.reload();	
+	}
+	
+$(".editFromValidation").click(function(){
+   if(document.getElementById("editOrgName").value == "" || document.getElementById("editAddress").value == "" ){
+		alert("Please fill the mandatory fields !!!");
+		}else{
+		  $("#updateCompanyForm").submit();
+		}
+	});
+
+$(".addFromValidation").click(function(){
+   if(document.getElementById("orgName").value == "" || document.getElementById("address").value == "" ){
+		alert("Please fill the mandatory fields !!!");
+		}else{
+		  $("#saveCompanyForm").submit();
+		}
+	});	
+		
+</script>
+</body>
+</html>

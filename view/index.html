@@ -1,0 +1,351 @@
+<html>
+<head>
+  <title>Express HTML</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<style>
+		.row {
+			margin-right: -47px;
+			margin-left: 35px;
+		}
+	</style>	
+</head>
+<body>
+  <div style="margin:100px;">
+<nav class="navbar navbar-inverse navbar-static-top" style="background-image: linear-gradient(to bottom,#67ce65 0,#222 100%);">
+  <div class="container">
+    <a class="navbar-brand" href="/" style="color:#fff">Users List</a>
+         <button type="button" class="btn btn-danger btn-sm pull-right" style="margin-top: 10px;margin-right: 7%;" onclick="back()">Logout</button>
+	     <button type="button" class="btn btn-success btn-sm pull-right" onclick="addCompany()" style="margin-top: 10px;margin-right: 1%;">View Company</button>
+	  {% if loginUser.role == "Admin" %}
+	     <button type="button" class="btn btn-info btn-sm pull-right" data-toggle="modal" data-target="#myModal" id="recipentPlus" style="margin-top: 10px;margin-right: 1%;">Add User</button>
+	   {% endif %}	 
+  </div>
+</nav>
+  <div class="jumbotron"  style="padding:40px;background-color: #bf5f5f;"> 
+	  	<table class="table">
+		<thead>
+			<tr>
+				<th style="color:#fff">User Name</th>			
+				<th style="color:#fff">Email</th>
+				<th style="color:#fff">Role</th>
+				<th style="color:#fff">Company Name</th>
+				<th style="color:#fff;text-align: right;">Action</th>
+			</tr>	
+		</thead>
+		<tbody>
+		{% for x in values %}
+			<tr style="background-color:#928f7b">
+				<td style="color:#fff">{{x.userName}}</td>	
+				<td style="color:#fff">{{x.email}}</td>			
+				<td style="color:#fff">{{x.role}}</td>
+				<td style="color:#fff">{{x.companyName}}</td>
+				<td>
+			    <button type="button" class="btn btn-primary btn-xs pull-right" onclick="viewData('{{x.id}}')">View</button>		
+			{% if loginUser.role == "Admin" %}
+ 				<button type="button" class="btn btn-warning btn-xs pull-right" onclick="editUser('{{x.id}}')" style="margin-right: 2px;">Edit</button>
+				<button type="button" class="btn btn-danger btn-xs pull-right" onclick="deleteUser('{{x.id}}')" style="margin-right: 3px;">Delete</button>
+			{% endif %}	
+				</td>
+			<tr>	
+		{% endfor %}
+		</tbody>
+
+	</table>
+     	
+    </div>
+  </div>
+  
+<!-- Add user Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add User</h4>
+        </div>
+		 <form method="post" action="/addUser" id="addUserForm"> 
+        <div class="modal-body">
+		  <div class="row col-offset-1">
+				<div class="col-md-5">
+				  <label>User Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="hidden" class="form-control" id="userRole" name="userRole" value="{{loginUser.email}}"/>
+				  <input type="text" class="form-control" id="userName" name="userName" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Email:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control" id="email" name="email" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Role:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<select type="text" class="form-control" id="role" name="role">
+						<option>Please Select</option>
+						<option value="Admin">Admin</option>
+						<option value="User">User</option>
+					</select>
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Company Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<select type="text" class="form-control" id="companyName" name="companyName">
+						<option>Please Select</option>
+						<option value="TCS">TCS</option>
+						<option value="Kenla Syatems">Kenla Syatems</option>
+					</select>
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Password:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control" id="password" name="password" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Conform Password:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control" id="conformPassword" name="conformPassword" />
+				</div>
+			  </div>
+        </div>
+        <div class="modal-footer">
+		  <button type="button" class="btn btn-success formValidation">Save</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+		  </form>	 
+   
+    </div>
+
+  </div>
+</div>
+	
+<!-- edit user Modal -->
+  <div class="modal fade" id="editUsermyModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit User</h4>
+        </div>
+		 <form method="post" action="/updateUser" id="editUserForm"> 
+        <div class="modal-body">
+		  <div class="row col-offset-1">
+				<div class="col-md-5">
+				  <label>User Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<input type="hidden" class="form-control" id="editId" name="id" />
+					<input type="hidden" class="form-control" id="edUserRole" name="edUserRole" value="{{loginUser.email}}"/>
+					<input type="text" class="form-control uName" id="editUserName" name="userName" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Email:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control uEail" id="editEmail" name="email" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Role:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<select type="text" class="form-control uRole" id="editRole" name="role">
+						<option value="">Please Select</option>
+						<option value="Admin">Admin</option>
+						<option value="User">User</option>
+					</select>
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Company Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+					<select type="text" class="form-control uComapnyName" id="editcompanyName" name="companyName">
+						<option value="">Please Select</option>
+						<option value="TCS">TCS</option>
+						<option value="Kenla Syatems">Kenla Syatems</option>
+					</select>
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Password:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control uPassword" id="editPassword" name="password" />
+				</div>
+			  </div>
+			<div class="row col-offset-1" style="margin-top: 10px;">
+				<div class="col-md-5">
+				  <label>Conform Password:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control uConformPassword" id="editConformPassword" name="conformPassword" />
+				</div>
+			  </div>
+        </div>
+        <div class="modal-footer">
+		  <button type="button" class="btn btn-success editFromValidation">Save</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+		  </form>	 
+   
+    </div>
+
+  </div>
+</div>	
+	
+<!-- View user Modal -->
+  <div class="modal fade" id="viewUsermyModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">View User</h4>
+        </div>
+		 <form > 
+        <div class="modal-body">
+		  <table class="table table-bordered">
+			<thead>
+			 	<th style="background-color:#006666;color:#fff">User Name</th>
+				<th style="background-color:#006666;color:#fff">Email</th>
+				<th style="background-color:#006666;color:#fff">Role</th>
+				<th style="background-color:#006666;color:#fff">Company Name</th>
+			</thead>
+			<tbody id="table">
+			</tbody>
+		  </table>
+		</div>
+        <div class="modal-footer">
+		  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+		  </form>	 
+   
+    </div>
+
+  </div>
+</div>	
+	
+
+<script>
+
+	
+	
+// WRITE THE VALIDATION SCRIPT IN THE HEAD TAG.
+function isNumber(evt) {
+    var iKeyCode = (evt.which) ? evt.which : evt.keyCode
+    if (iKeyCode != 46 && iKeyCode > 31 && (iKeyCode < 48 || iKeyCode > 57))
+        return false;
+
+    return true;
+}
+
+function back(){
+	location.href="/";
+}
+	
+function addCompany(){
+	var userRole = {{JSON.stringify(loginUser.role)}}
+    location.href="/addCompany/"+userRole;
+}
+
+function editUser(idVal){
+	$('#editUsermyModal').modal('show');
+	$.ajax({
+    url: '/editUser/'+idVal,
+    type: 'put',
+    success: function(result) {
+				$('#editUserName').val(result.dbUser.userName);
+				$('#editEmail').val(result.dbUser.email);
+				$('#editRole').val(result.dbUser.role);
+		        $('#editcompanyName').val(result.dbUser.companyName);
+		        $('#editPassword').val(result.dbUser.password);
+				$('#editConformPassword').val(result.dbUser.conformPassword);
+		        $('#editId').val(result.dbUser._id);
+				}
+  	});
+}	
+
+function deleteUser(idVal){
+	$.ajax({
+    url: '/deleteUser/'+idVal,
+    type: 'delete',
+    success: function(result) {
+    
+    }
+});
+  location.reload();	
+}	
+	
+$(".formValidation").click(function(){
+   if(document.getElementById("userName").value == "" || document.getElementById("email").value == "" || document.getElementById("role").value == "" || document.getElementById("companyName").value == "" || document.getElementById("password").value == "" || document.getElementById("conformPassword").value == ""){
+		alert("Please fill the mandatory fields !!!");
+		}else{
+		  $("#addUserForm").submit();
+		}
+	});
+	
+$(".editFromValidation").click(function(){
+   if(document.getElementById("editUserName").value == "" || document.getElementById("editEmail").value == "" || document.getElementById("editRole").value == "" || document.getElementById("editcompanyName").value == "" || document.getElementById("editPassword").value == "" || document.getElementById("editConformPassword").value == ""){
+		alert("Please fill the mandatory fields !!!");
+		}else{
+		  $("#editUserForm").submit();
+		}
+	});
+	
+function loginPage(){
+  location.href="/loginPage";
+}	
+
+function viewData(idVal){
+	$('#viewUsermyModal').modal('show');
+	$.ajax({
+    url: '/editUser/'+idVal,
+    type: 'put',
+    success: function(result) {
+		var content="";
+			content+='<tr>'+
+					   		'<td>'+result.dbUser.userName+'</td>'+
+							'<td>'+result.dbUser.email+'</td>'+
+							'<td>'+result.dbUser.role+'</td>'+ 
+							'<td>'+result.dbUser.companyName+'</td>'+
+					   	  '</tr>'
+			$('#table').html(content);		
+
+		}
+  	});
+}		
+	
+	
+		
+</script>
+</body>
+</html>

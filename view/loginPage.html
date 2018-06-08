@@ -1,0 +1,82 @@
+<html>
+<head>
+  <title>Express HTML</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<style>
+		.row {
+			margin-right: -47px;
+			margin-left: 60px;
+		}
+	
+
+	</style>	
+</head>
+<body>
+  <div style="margin:100px;">
+
+<nav class="navbar navbar-inverse navbar-static-top" style="background-image: linear-gradient(to bottom,#67ce65 0,#222 100%);">
+  <div class="container">
+    <a class="navbar-brand" href="/" style="color:#fff">Login Page</a>
+       
+  </div>
+</nav>
+  <div class="jumbotron"  style="padding:40px;background-color: #bf5f5f;border-radius: 14px;"> 
+	   <form method="post" action="/loginAuth" id="loginAuthForm"> 
+      		<div class="row col-offset-1">
+				<div class="col-md-5">
+				  <label style="color:#fff">User Name:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control" id="email" name="email" />
+				</div>
+			  </div>
+		  	<div class="row col-offset-1" style="margin-top: 14px;">
+				<div class="col-md-5">
+				  <label style="color:#fff">Password:<span style="color:red">*</span></label>
+				</div>
+				<div class="col-md-5">
+				  <input type="text" class="form-control" id="password" name="password" />
+				</div>
+			  </div>
+		   <div class="row col-offset-1" style="margin-top: 14px;">
+				<div class="col-md-5">
+				</div>
+				<div class="col-md-5">
+				  <input type="button" class="form-control btn btn-success loginPageValidation" value="Submit" />
+				</div>
+			  </div>
+		   
+	  </form>
+     	
+    </div>
+  </div>
+  
+	
+
+
+<script>
+	$(".loginPageValidation").click(function(){
+		 if(document.getElementById("email").value == "" || document.getElementById("password").value == ""){
+		alert("Please fill the mandatory fields !!!");
+		}else{
+		  $.ajax({
+			url: '/emailValidation/'+document.getElementById("email").value,
+			type: 'get',
+			success: function(result) {
+				if(result.dbUser == null){
+				   alert("Please give valid user name and password !!!")
+				   }else{
+				   $("#loginAuthForm").submit();
+				   }
+			}
+		  });
+		}
+	});
+
+		
+</script>
+</body>
+</html>
